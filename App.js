@@ -4,7 +4,11 @@ import { StyleSheet, Text, View, StatusBar, Dimensions, Platform , TextInput} fr
 const {height, width} = Dimensions.get("window");
 
 export default class App extends React.Component {
+  state = {
+    newTodo : ""
+  }
   render() {
+    const {newTodo} = this.state;
     return (
       <View style={styles.container}>
         <StatusBar 
@@ -12,10 +16,23 @@ export default class App extends React.Component {
         />
         <Text style={styles.title}  >Kawai To do</Text>
         <View style={styles.card}>
-          <TextInput style={styles.input} placeholder={"New To Do"}></TextInput>
+          <TextInput 
+            style={styles.input} 
+            placeholder={"New To Do"} 
+            value={newTodo}
+            onChangeText={this._controllNewTodo}
+            placeholderTextColor={"#999"}
+            returnKeyType={"done"}
+            
+            /> 
         </View>
       </View>
     );
+  }
+  _controllNewTodo = text =>{
+    this.setState({
+      newTodo : text
+    })
   }
 }
 
@@ -54,6 +71,9 @@ const styles = StyleSheet.create({
     })
   },
   input : {
-    fontSize : 10
+    padding : 20,
+    borderBottomColor : "#bbb",
+    borderBottomWidth : 1,
+    fontSize : 25
   }
 });
