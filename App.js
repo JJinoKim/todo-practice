@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View, StatusBar, Dimensions, Platform , TextInput} from 'react-native';
+import { StyleSheet, Text, View, StatusBar, Dimensions, Platform , TextInput, ScrollView} from 'react-native';
+import ToDo from "./ToDo";
 
 const {height, width} = Dimensions.get("window");
 
@@ -23,8 +24,11 @@ export default class App extends React.Component {
             onChangeText={this._controllNewTodo}
             placeholderTextColor={"#999"}
             returnKeyType={"done"}
-            
+            autoCorrect={false}
             /> 
+            <ScrollView>
+              <ToDo />
+            </ScrollView>
         </View>
       </View>
     );
