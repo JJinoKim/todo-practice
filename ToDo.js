@@ -1,27 +1,57 @@
 import React,{ Component } from "react";
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity} from "react-native"
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, TextInput} from "react-native"
+import PropTypes from "prop-types";
 
 const { width, height } = Dimensions.get("window")
 
 export default class ToDo extends Component{
+    constructor(props){
+        super(props);
+        this.state = { isEditing: false, todoValue : props.text}
+    }
+    static PropTypes = {
+        text : PropTypes.string.isComplete,
+        isComplete : PropTypes.bool.isRequired,
+        deleteToDo : PropTypes.func.isRequired,
+        id : PropTypes.string.isRequired
+    }
     state = {
         isEditing : false,
-        isComplete : false
+        todoValue : ""
     };
     render(){
-        const {isComplete} = this.state;
+        const {isComplete, isEditing, todoValue} = this.state;
+        const { text, id , deleteToDo } = this.props;
         return(
             <View style={styles.container}>
                 <View style={styles.column}>
                     <TouchableOpacity onPress={this._toggleComplete}>
                         <View style={[styles.circle, isComplete ? styles.completedCircle : styles.uncompletedCircle]} />
                     </TouchableOpacity>
-                    <Text style={[styles.text, isComplete ? styles.completedText : styles.uncompletedText ]}>Hello I'm a To Do</Text>
-                </View>
-                <View style={styles.column}>
+                    {isEditing ? 
+                        (<TextInput 
+                            style={[
+                                styles.input, 
+                                styles.text, 
+                                isComplete ? styles.completedText : styles.uncompletedText
+                                ]} 
+                            value={todoValue} 
+                            multiline={true} 
+                            onChangeText = {this._controllInput}
+                            returnKeyType ={"done"}
+                            onBlur={this._finishEditing}
+                            />
+                        ) : 
+                        (<Text style={[
+                                styles.text, 
+                                isComplete ? styles.completedText : styles.uncompletedText 
+                                ]}>
+                            {text}
+                        </Text>)}
+                    </View>
                     {isEditing ? (
                         <View style={styles.actions}>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPressOut={this._finishEditing}>
                                 <View style={styles.actionContainer}>
                                     <Text style={styles.actionText}>✅</Text>
                                 </View>
@@ -29,15 +59,19 @@ export default class ToDo extends Component{
                         </View>
                     ) : (
                         <View style={styles.actions}>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPressOut={this._startEditing}>
                                 <View style={styles.actionContainer}>
-                                    <Text style={styles.actionText}>✅</Text>
+                                    <Text style={styles.actionText}>✏️</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPressOut={()=> deleteToDo(id) }>
+                                <View style={styles.actionContainer}>
+                                    <Text style={styles.actionText}>❌</Text>
                                 </View>
                             </TouchableOpacity>
                         </View>
                     )}
                 </View>
-            </View>
         );
     }
 
@@ -47,7 +81,23 @@ export default class ToDo extends Component{
                 isComplete : !prevState.isComplete
             })
         })
+    };
+
+    _startEditing = () =>{
+        this.setState({isEditing : true});
+    };
+
+    _finishEditing = () =>{
+        this.setState({
+            isEditing : false
+        })
+    };
+    _controllInput = (text) =>{
+        this.setState({ todoValue : text });
     }
+
+
+    
 }
 
 const styles = StyleSheet.create({
@@ -56,7 +106,8 @@ const styles = StyleSheet.create({
         borderBottomColor : "#bbb",
         borderBottomWidth: StyleSheet.hairlineWidth,
         flexDirection : "row",
-        alignItems : "center"
+        alignItems : "center",
+        justifyContent : "space-between"
     },
     circle : {
         width : 30,
@@ -83,5 +134,24 @@ const styles = StyleSheet.create({
     },
     uncompletedText : {
         color : "#353839"
+    },
+    column : {
+        flexDirection : "row",
+        alignItems : "center",
+        width : width / 2,
+        justifyContent : "space-between"
+    },
+    actions : {
+        flexDirection : "row",
+
+    },
+    actionContainer : {
+        marginVertical : 10,
+        marginHorizontal  : 10
+    },
+    input : {
+        marginVertical : 10,
+        width : width /2
+
     }
 });
